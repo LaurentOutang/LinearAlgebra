@@ -18,3 +18,20 @@ public:
 protected:
 	std::string msg;
 };
+
+class SubVectorSizeException : public std::exception
+{
+public:
+	SubVectorSizeException(size_t start, size_t end)
+	{
+		std::stringstream ss;
+		ss << "Trying to extract vector of size " << end - start + 1 << " from index " << start << " to " << end << '.';
+		msg = ss.str();
+	}
+	const char* what() const noexcept override
+	{
+		return msg.c_str();
+	}
+protected:
+	std::string msg;
+};

@@ -1,10 +1,10 @@
 #pragma once
 #include <vector>
-#include <assert.h>
 #include <iostream>
 #include <complex>
 #include <type_traits>
 #include "Traits.h"
+#include "VectorExceptions.h"
 
 template<typename TYPE, typename E>
 class VectorExpr
@@ -136,7 +136,8 @@ protected:
 	E2 const& _e2;
 public:
 	VectorSum(E1 const& e1, E2 const& e2) : _e1(e1), _e2(e2) {
-		assert(_e1.size() == _e2.size());
+		if (_e1.size() != _e1.size())
+			throw IncompatibleVectorSizeException(_e1.size(), _e2.size())
 	}
 
 	TYPE operator()(size_t i) const { return _e1(i) + _e2(i); }
@@ -160,7 +161,8 @@ protected:
 	E2 const& _e2;
 public:
 	VectorDiff(E1 const& e1, E2 const& e2) : _e1(e1), _e2(e2) {
-		assert(_e1.size() == _e2.size());
+		if (_e1.size() != _e2.size())
+			throw IncompatibleVectorSizeException(_e1.size(), _e2.size());
 	}
 
 	TYPE operator()(size_t i) const { return _e1(i) - _e2(i); }
@@ -222,7 +224,8 @@ class SubVector : public VectorExpr<TYPE, SubVector<TYPE, E1>>
 {
 public:
 	SubVector(E1& e1, size_t start, size_t end) : _e1(e1), _start(start), _end(end) {
-		assert(_end >= _start);
+		if (_end < _start)
+			throw SubVectorSizeException(_start, _end);
 	}
 
 	TYPE operator()(size_t i) const { return _e1(i + _start); }
@@ -235,7 +238,8 @@ public:
 	template<typename E2>
 	SubVector& operator+=(VectorExpr<TYPE, E2> const& vec)
 	{
-		assert(this->size() == vec.size());
+		if (this->size() != vec.size())
+			throw IncompatibleVectorSizeException(this->size(), vec.size());
 
 		for (size_t k = 0; k < this->size(); ++k)
 		{
@@ -247,7 +251,8 @@ public:
 	template<typename E2>
 	SubVector& operator-=(VectorExpr<TYPE, E2> const& vec)
 	{
-		assert(this->size() == vec.size());
+		if (this->size() != vec.size())
+			throw IncompatibleVectorSizeException(this->size(), vec.size());
 
 		for (size_t k = 0; k < this->size(); ++k)
 		{
@@ -291,7 +296,8 @@ class ConstSubVector : public VectorExpr<TYPE, ConstSubVector<TYPE, E1>>
 {
 public:
 	ConstSubVector(E1 const& e1, size_t start, size_t end) : _e1(e1), _start(start), _end(end) {
-		assert(_end >= _start);
+		if (_end < _start)
+			throw SubVectorSizeException(_start, _end);
 	}
 
 	TYPE operator()(size_t i) const { return _e1(i + _start); }

@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "Matrix.h"
+#include "MatrixExceptions.h"
 
 enum class SIDE {LEFT, RIGHT};
 
@@ -28,7 +29,8 @@ Matrix<TYPE> operator*(HouseHolderReflectors<TYPE> const& Q, MatrixExpr<TYPE, E1
 	Matrix<TYPE> copy = expr;//Force evaluation and copy
 
 	size_t m = Q._mat.shape().i;
-	assert(m == copy.shape().i);
+	if (m != copy.shape().i)
+		throw IncompatibleShapesException(Q._mat.shape(), copy.shape(), OPERATION::MULT);
 
 	size_t s = std::min(Q._mat.shape().i - 1, Q._mat.shape().j);
 
@@ -67,7 +69,8 @@ Matrix<TYPE> operator*(MatrixExpr<TYPE, E1> const& expr, HouseHolderReflectors<T
 	Matrix<TYPE> copy = expr;//Force evaluation and copy
 
 	size_t m = Q._mat.shape().i;
-	assert(m == copy.shape().j);
+	if (m != copy.shape().i)
+		throw IncompatibleShapesException(copy.shape(), Q._mat.shape(), OPERATION::MULT);
 
 	size_t s = std::min(Q._mat.shape().i - 1, Q._mat.shape().j);
 
@@ -123,7 +126,8 @@ Matrix<std::complex<TYPE>> operator*(HouseHolderReflectors<std::complex<TYPE>> c
 	Matrix<std::complex<TYPE>> copy = expr;//Force evaluation and copy
 
 	size_t m = Q._mat.shape().i;
-	assert(m == copy.shape().i);
+	if (m != copy.shape().i)
+		throw IncompatibleShapesException(Q._mat.shape(), copy.shape(), OPERATION::MULT);
 
 	size_t s = std::min(Q._mat.shape().i - 1, Q._mat.shape().j);
 
@@ -162,7 +166,8 @@ Matrix<std::complex<TYPE>> operator*(MatrixExpr<std::complex<TYPE>, E1> const& e
 	Matrix<std::complex<TYPE>> copy = expr;//Force evaluation and copy
 
 	size_t m = Q._mat.shape().i;
-	assert(m == copy.shape().j);
+	if (m != copy.shape().i)
+		throw IncompatibleShapesException(copy.shape(), Q._mat.shape(), OPERATION::MULT);
 
 	size_t s = std::min(Q._mat.shape().i - 1, Q._mat.shape().j);
 
